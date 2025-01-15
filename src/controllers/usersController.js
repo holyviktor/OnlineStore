@@ -18,7 +18,7 @@ async function getUserByLogin(req, res, next){
 
 async function createUser(req, res, next){
     try{
-        res.json(await userService.addUser(req.body.userData));
+        res.json(await userService.addUser(req.body));
     }catch (err){
         next(new Error(err));
     }
@@ -26,7 +26,7 @@ async function createUser(req, res, next){
 
 async function editUser(req, res, next){
     try{
-        res.json(await userService.editUser(req.params.userLogin, req.body.userData));
+        res.json(await userService.editUser(req.params.userLogin, req.body));
     }catch (err){
         next(new Error(err));
     }

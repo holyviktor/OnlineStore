@@ -1,22 +1,17 @@
-const fileService = require('./fileAccessor');
+const fileUtil = require('../utils/fileUtil');
 const storageConfig = require('../configs/storageConfig');
+
 const productStorage = `${storageConfig.storageDirectory}${storageConfig.storageFiles.PRODUCTS}`;
-const keyWord = 'products';
 
 async function getProducts(){
-    let productsContent = await fileService.readFile(productStorage);
-    return JSON.parse(productsContent)[keyWord];
-}
-
-async function writeProducts(products){
-    await fileService.writeFile(productStorage, JSON.stringify({[keyWord]:products}));
+    return fileUtil.readFile(productStorage);
 }
 
 async function addProduct(product){
     let products = await getProducts();
     let createdProduct = {id:Date.now().toString(), ...product};
     products.push(createdProduct);
-    await writeProducts(products);
+    await fileUtil.writeFile(productStorage, products)
     return product;
 }
 
@@ -39,14 +34,14 @@ async function editProduct(productId, productData){
         }
         return product;
     })
-    await writeProducts(products);
+    await fileUtil.writeFile(productStorage, products)
     return changedProduct;
 }
 
 async function deleteProduct(productId) {
     let products = await getProducts();
     products = products.filter(product => product.id !== productId);
-    await writeProducts(products);
+    await fileUtil.writeFile(productStorage, products)
     return products;
 }
 

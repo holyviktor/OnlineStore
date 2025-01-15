@@ -1,15 +1,8 @@
 const express = require('express');
 const categoriesController = require('../controllers/categoriesController');
+const {ROUTES} = require('../constants/categoriesConstants');
 
 const router = express.Router();
-
-const ROUTES = {
-    GET: '/',
-    GET_BY_ID: '/:categoryId',
-    DELETE: '/delete',
-    ADD: '/add',
-    EDIT: '/edit'
-}
 
 router.get(ROUTES.GET, categoriesController.getCategories);
 

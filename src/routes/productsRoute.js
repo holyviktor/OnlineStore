@@ -1,15 +1,8 @@
 const express = require('express');
-const router = express.Router();
 const productsController = require('../controllers/productsController');
+const {ROUTES} = require('../constants/productsConstants');
 
-const ROUTES = {
-    GET: '/',
-    GET_BY_ID: '/:productId',
-    GET_BY_CATEGORY: '/category/:categoryId',
-    ADD: '/add',
-    DELETE: '/delete',
-    EDIT: '/edit'
-}
+const router = express.Router();
 
 router.get(ROUTES.GET, productsController.getProducts);
 

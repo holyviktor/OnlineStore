@@ -1,11 +1,11 @@
 const fs = require("fs/promises");
 
 async function readFile(fileName){
-    return await fs.readFile(fileName,  'utf8');
+    return JSON.parse(await fs.readFile(fileName, 'utf8'));
 }
 
 async function writeFile(fileName, content){
-    await fs.writeFile(fileName, content);
+    return fs.writeFile(fileName, JSON.stringify(content));
 }
 
 

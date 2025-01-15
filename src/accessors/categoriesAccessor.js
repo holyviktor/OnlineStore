@@ -1,15 +1,9 @@
-const fileService = require('./fileAccessor');
+const fileUtil = require('../utils/fileUtil');
 const storageConfig = require('../configs/storageConfig');
 const categoriesStorage = `${storageConfig.storageDirectory}${storageConfig.storageFiles.CATEGORIES}`;
-const keyWord = 'categories';
 
 async function getCategories(){
-    let categoriesContent = await fileService.readFile(categoriesStorage);
-    return JSON.parse(categoriesContent)[keyWord];
-}
-
-async function writeCategories(categories){
-    await fileService.writeFile(categoriesStorage, JSON.stringify({[keyWord]:categories}));
+    return fileUtil.readFile(categoriesStorage);
 }
 
 async function getCategoryById(categoryId){
@@ -21,7 +15,7 @@ async function addCategory(category){
     let categories = await getCategories();
     let createdCategory = {id:Date.now().toString(), ...category};
     categories.push(createdCategory);
-    await writeCategories(categories);
+    await fileUtil.writeFile(categoriesStorage, categories);
     return createdCategory;
 }
 
@@ -39,14 +33,14 @@ async function editCategory(categoryId, categoryData){
         }
         return category;
     })
-    await writeCategories(categories);
+    await fileUtil.writeFile(categoriesStorage, categories);
     return changedCategory;
 }
 
 async function deleteCategory(categoryId) {
     let categories = await getCategories();
     categories = categories.filter(category => category.id !== categoryId);
-    await writeCategories(categories);
+    await fileUtil.writeFile(categoriesStorage, categories);
     return categories;
 }
 

@@ -1,27 +1,21 @@
-const fileService = require('./fileAccessor');
+const fileUtil = require('../utils/fileUtil');
 const storageConfig = require('../configs/storageConfig');
 const usersStorage = `${storageConfig.storageDirectory}${storageConfig.storageFiles.USERS}`;
-const keyWord = 'users';
 
 async function getUsers(){
-    let productsContent = await fileService.readFile(usersStorage);
-    return JSON.parse(productsContent)[keyWord];
+    return await fileUtil.readFile(usersStorage);
 }
 
-async function writeUsers(users){
-    await fileService.writeFile(usersStorage, JSON.stringify({[keyWord]:users}));
-}
-
-async function getUserByLogin(login){
+async function getUserByLogin(userLogin){
     let users = await getUsers();
-    return users.find(user=>user.login === login) || null;
+    return users.find(user=>user.login === userLogin) || null;
 }
 
 async function addUser(user){
     let users = await getUsers();
-    let createdUser = {role:'user', ...user, cart:[], orders:[]};
+    let createdUser = {...user, role:'user', cart:[], orders:[]};
     users.push(createdUser);
-    await writeUsers(users);
+    await fileUtil.writeFile(usersStorage, users);
     return createdUser;
 }
 
@@ -39,17 +33,15 @@ async function editUser(userLogin, userData) {
         }
         return user;
     })
-    await writeUsers(users);
+    await fileUtil.writeFile(usersStorage, users);
     return changedUser;
 }
 
 async function deleteUser(userLogin) {
     let users = await getUsers();
     users = users.filter(user => user.login !== userLogin);
-    await writeUsers(users);
+    await fileUtil.writeFile(usersStorage, users);
     return users;
 }
-
-
 
 module.exports = {getUsers, getUserByLogin, addUser, editUser, deleteUser};

@@ -1,14 +1,11 @@
 const express = require('express');
 const usersController = require('../controllers/usersController');
+const cartRouter = require('./cartRoute');
+const {ROUTES} = require('../constants/usersConstants');
+
 const router = express.Router();
 
-const ROUTES = {
-    GET: '/',
-    GET_BY_LOGIN: '/:userLogin',
-    CREATE: '/create',
-    EDIT: '/edit/:userLogin',
-    DELETE: '/delete/:userLogin',
-}
+router.use(ROUTES.CART, cartRouter);
 
 router.get(ROUTES.GET, usersController.getUsers);
 
