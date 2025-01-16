@@ -1,5 +1,6 @@
 const categoriesAccessor = require('../accessors/categoriesAccessor');
 const newValidationError = require('../utils/validationErrorUtil');
+const CustomError = require('../handlers/customError');
 
 const requiredProperties = ['name'];
 

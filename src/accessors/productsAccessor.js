@@ -42,7 +42,7 @@ async function deleteProduct(productId) {
     let products = await getProducts();
     products = products.filter(product => product.id !== productId);
     await fileUtil.writeFile(productStorage, products)
-    return products;
+    return productId;
 }
 
 

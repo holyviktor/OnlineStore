@@ -41,7 +41,7 @@ async function deleteUser(userLogin) {
     let users = await getUsers();
     users = users.filter(user => user.login !== userLogin);
     await fileUtil.writeFile(usersStorage, users);
-    return users;
+    return userLogin;
 }
 
 module.exports = {getUsers, getUserByLogin, addUser, editUser, deleteUser};

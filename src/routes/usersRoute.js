@@ -5,8 +5,6 @@ const {ROUTES} = require('../constants/usersConstants');
 
 const router = express.Router();
 
-router.use(ROUTES.CART, cartRouter);
-
 router.get(ROUTES.GET, usersController.getUsers);
 
 router.get(ROUTES.GET_BY_LOGIN, usersController.getUserByLogin);

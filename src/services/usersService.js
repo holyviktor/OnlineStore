@@ -1,6 +1,7 @@
 const usersAccessor = require('../accessors/usersAccessor');
 const {requiredProperties, regExpEmail, regExpPhoneNumber} = require('../constants/usersConstants');
 const newValidationError = require('../utils/validationErrorUtil');
+const CustomError = require('../handlers/customError');
 
 async function getUsers(){
     return usersAccessor.getUsers();
@@ -43,6 +44,8 @@ async function deleteUser(userLogin){
 
 async function checkIfUserExists(userLogin){
     let users = await usersAccessor.getUsers();
+    console.log(users)
+    console.log(users.some(user=>user.login === userLogin))
     return users.some(user=>user.login === userLogin);
 }
 
@@ -76,4 +79,4 @@ function checkUser(user, isAllRequired){
 
 
 
-module.exports = {getUserByLogin, editUser, addUser, deleteUser, getUsers}
+module.exports = {getUserByLogin, editUser, addUser, deleteUser, getUsers, checkIfUserExists};

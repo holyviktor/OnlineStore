@@ -41,7 +41,7 @@ async function deleteCategory(categoryId) {
     let categories = await getCategories();
     categories = categories.filter(category => category.id !== categoryId);
     await fileUtil.writeFile(categoriesStorage, categories);
-    return categories;
+    return categoryId;
 }
 
 module.exports = {getCategories, getCategoryById, addCategory, editCategory, deleteCategory}

@@ -1,6 +1,7 @@
 const productsAccessor = require('../accessors/productsAccessor');
 const categoriesService = require('../services/categoriesService');
 const newValidationError = require('../utils/validationErrorUtil');
+const CustomError = require('../handlers/customError');
 
 const requiredProperties = ["categoryId", "name", "price", "photo", "description"];
 
@@ -77,4 +78,4 @@ async function checkIfProductExists(productId) {
 }
 
 
-module.exports = {get, getByCategory, add, edit, del, getById};
+module.exports = {get, getByCategory, add, edit, del, getById, checkIfProductExists};

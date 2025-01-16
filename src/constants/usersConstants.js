@@ -8,7 +8,6 @@ const ROUTES = {
     CREATE: '/create',
     EDIT: '/edit/:userLogin',
     DELETE: '/delete/:userLogin',
-    CART: '/:userLogin/cart'
 }
 
 module.exports = {requiredProperties, regExpEmail, regExpPhoneNumber, ROUTES};

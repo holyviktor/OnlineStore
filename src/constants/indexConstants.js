@@ -1,7 +1,8 @@
 const ROUTES = {
     PRODUCTS: '/products',
     USERS: '/users',
-    CATEGORIES: '/categories'
+    CATEGORIES: '/categories',
+    CART: '/cart'
 };
 
 module.exports = {ROUTES};

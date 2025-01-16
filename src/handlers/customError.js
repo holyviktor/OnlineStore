@@ -1,6 +1,8 @@
 class CustomError{
-    constructor(status, message, isValid) {
+    constructor(status, message) {
         this.status = status;
         this.message = message;
     }
 }
+
+module.exports = CustomError;
