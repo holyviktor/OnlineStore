@@ -10,7 +10,7 @@ async function getOrders(req, res, next){
 
 async function getOrderById(req, res, next){
     try{
-        res.json(await ordersService.getOrderById(req.params.orderId));
+        res.json(await ordersService.getOrderById(req.params.userLogin, req.params.orderId));
     }catch (err){
         next(err);
     }

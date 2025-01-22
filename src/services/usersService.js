@@ -1,16 +1,27 @@
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const usersAccessor = require('../accessors/usersAccessor');
 const {requiredProperties, regExpEmail, regExpPhoneNumber} = require('../constants/usersConstants');
 const newValidationError = require('../utils/validationErrorUtil');
 const CustomError = require('../handlers/customError');
+const auth = require('../middlewares/authMiddleware');
 
 async function getUsers(){
     return usersAccessor.getUsers();
 }
 
 async function getUserByLogin(login){
-    let user = usersAccessor.getUserByLogin(login);
+    let user = await usersAccessor.getUserByLogin(login);
     if (!user) throw new CustomError(404, 'User not found');
     return user;
+}
+
+async function loginUser(login, password){
+    const user = await getUserByLogin(login);
+    if (!await bcrypt.compare(password, user.password)){
+        throw new CustomError(400, 'Wrong login or password!');
+    }
+    return auth.issueToken({login: user.login, role: user.role});
 }
 
 async function addUser(user) {
@@ -21,7 +32,8 @@ async function addUser(user) {
     if (!validation.isValid) {
         throw new CustomError(validation.status, validation.message);
     }
-    return await usersAccessor.addUser(user);
+    const hashedPassword = await bcrypt.hash(user.password, 10);
+    return usersAccessor.addUser({...user, password: hashedPassword});
 }
 
 async function editUser(userLogin, userData){
@@ -39,13 +51,11 @@ async function deleteUser(userLogin){
     if (!await checkIfUserExists(userLogin)){
         throw new CustomError(404, "User doesn't exists");
     }
-    return await usersAccessor.deleteUser(userLogin)
+    return usersAccessor.deleteUser(userLogin);
 }
 
 async function checkIfUserExists(userLogin){
     let users = await usersAccessor.getUsers();
-    console.log(users)
-    console.log(users.some(user=>user.login === userLogin))
     return users.some(user=>user.login === userLogin);
 }
 
@@ -78,5 +88,6 @@ function checkUser(user, isAllRequired){
 }
 
 
-
-module.exports = {getUserByLogin, editUser, addUser, deleteUser, getUsers, checkIfUserExists};
+module.exports = {
+    getUserByLogin, editUser, addUser, deleteUser, getUsers, checkIfUserExists, loginUser
+};

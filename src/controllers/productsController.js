@@ -4,7 +4,7 @@ async function getProducts(req, res, next){
     try{
         res.json(await productsService.get());
     }catch (err){
-        next(new Error(err));
+        next(err);
     }
 }
 
@@ -19,7 +19,7 @@ async function getProductById(req, res, next){
     try{
         res.json(await productsService.getById(req.params.productId));
     }catch (err){
-        next(new Error(err));
+        next(err);
     }
 }
 
@@ -27,7 +27,7 @@ async function addProduct(req, res, next){
     try{
         res.json(await productsService.add(req.body));
     }catch (err){
-        next(new Error(err));
+        next(err);
     }
 }
 
@@ -35,7 +35,7 @@ async function editProducts(req, res, next){
     try{
         res.json(await productsService.edit(req.params.productId, req.body));
     }catch (err){
-        next(new Error(err));
+        next(err);
     }
 }
 
@@ -43,7 +43,7 @@ async function deleteProduct(req, res, next){
     try{
         res.json(await productsService.del(req.params.productId));
     }catch (err){
-        next(new Error(err));
+        next(err);
     }
 }
 

@@ -7,18 +7,24 @@ async function getOrders() {
     return ordersAccessor.getOrders();
 }
 
-async function getOrderById(orderId) {
+async function getOrderById(userLogin, orderId, authorizedRole, authorizedLogin) {
+    if (!userService.checkIfRoleAppropriate(userLogin, authorizedRole, authorizedLogin))
+        throw new CustomError(403, "Access denied!");
     return ordersAccessor.getOrderById(orderId);
 }
 
-async function getOrdersByLogin(userLogin) {
+async function getOrdersByLogin(userLogin, authorizedRole, authorizedLogin) {
+    if (!userService.checkIfRoleAppropriate(userLogin, authorizedRole, authorizedLogin))
+        throw new CustomError(403, "Access denied!");
     if (!await userService.checkIfUserExists(userLogin)){
         throw new CustomError(404, "User doesn't exists");
     }
     return ordersAccessor.getUserOrders(userLogin);
 }
 
-async function createOrder(userLogin, order){
+async function createOrder(userLogin, order, authorizedRole, authorizedLogin){
+    if (!userService.checkIfRoleAppropriate(userLogin, authorizedRole, authorizedLogin))
+        throw new CustomError(403, "Access denied!");
     if (!await userService.checkIfUserExists(userLogin)){
         throw new CustomError(404, "User doesn't exists");
     }
@@ -40,7 +46,9 @@ async function createOrder(userLogin, order){
     return ordersAccessor.createOrder(userLogin, createdOrder);
 }
 
-async function deleteOrder(userLogin, orderId){
+async function deleteOrder(userLogin, orderId, authorizedRole, authorizedLogin){
+    if (!userService.checkIfRoleAppropriate(userLogin, authorizedRole, authorizedLogin))
+        throw new CustomError(403, "Access denied!");
     if (!await hasUserOrderId(userLogin, orderId)){
         throw new CustomError(404, "User don't have order with this id!");
     }

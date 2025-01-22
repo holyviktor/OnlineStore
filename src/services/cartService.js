@@ -3,14 +3,18 @@ const userService = require('./usersService');
 const productService = require('./productsService');
 const CustomError = require('../handlers/customError');
 
-async function getCartByLogin(userLogin) {
+async function getCartByLogin(userLogin, authorizedRole, authorizedLogin) {
+    if (!userService.checkIfRoleAppropriate(userLogin, authorizedRole, authorizedLogin))
+        throw new CustomError(403, "Access denied!");
     if (!await userService.checkIfUserExists(userLogin)){
         throw new CustomError(404, "User doesn't exists");
     }
    return cartAccessor.getCartByUserLogin(userLogin);
 }
 
-async function addToCart(userLogin, productId, count){
+async function addToCart(userLogin, productId, count, authorizedRole, authorizedLogin){
+    if (!userService.checkIfRoleAppropriate(userLogin, authorizedRole, authorizedLogin))
+        throw new CustomError(403, "Access denied!");
     if (!await userService.checkIfUserExists(userLogin)){
         throw new CustomError(404, "User doesn't exists");
     }
@@ -23,7 +27,9 @@ async function addToCart(userLogin, productId, count){
     return cartAccessor.addToCart(userLogin, productId, count);
 }
 
-async function clearFromCart(userLogin, productId){
+async function clearFromCart(userLogin, productId, authorizedRole, authorizedLogin){
+    if (!userService.checkIfRoleAppropriate(userLogin, authorizedRole, authorizedLogin))
+        throw new CustomError(403, "Access denied!");
     if (!await userService.checkIfUserExists(userLogin)){
         throw new CustomError(404, "User doesn't exists");
     }
@@ -36,7 +42,9 @@ async function clearFromCart(userLogin, productId){
     return cartAccessor.clearFromCart(userLogin, productId);
 }
 
-async function subtractFromCart(userLogin, productId){
+async function subtractFromCart(userLogin, productId, authorizedRole, authorizedLogin){
+    if (!userService.checkIfRoleAppropriate(userLogin, authorizedRole, authorizedLogin))
+        throw new CustomError(403, "Access denied!");
     if (!await userService.checkIfUserExists(userLogin)){
         throw new CustomError(404, "User doesn't exists");
     }
@@ -49,7 +57,9 @@ async function subtractFromCart(userLogin, productId){
     return cartAccessor.subtractFromCart(userLogin, productId);
 }
 
-async function setToCart(userLogin, productId, count){
+async function setToCart(userLogin, productId, count, authorizedRole, authorizedLogin){
+    if (!userService.checkIfRoleAppropriate(userLogin, authorizedRole, authorizedLogin))
+        throw new CustomError(403, "Access denied!");
     if (!await userService.checkIfUserExists(userLogin)){
         throw new CustomError(404, "User doesn't exists");
     }

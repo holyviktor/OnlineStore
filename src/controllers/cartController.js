@@ -2,8 +2,6 @@ const cartService = require('../services/cartService');
 
 async function getByLogin(req, res, next){
     try{
-        console.log(req.params.userLogin)
-        console.log(req)
         res.json(await cartService.getCartByLogin(req.params.userLogin));
     }catch (err){
         next(err);
