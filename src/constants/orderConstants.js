@@ -4,5 +4,5 @@ const ROUTES = {
     GET_BY_ID: '/:userLogin/:orderId',
     CREATE: '/:userLogin/create',
     DELETE: '/:userLogin/delete/:orderId',
-}
-module.exports = {ROUTES};
+};
+module.exports = { ROUTES };

@@ -4,7 +4,7 @@ const storageFiles = {
     CATEGORIES: 'categories.json',
     ORDERS: 'orders.json',
     PRODUCTS: 'products.json',
-    USERS: 'users.json'
-}
+    USERS: 'users.json',
+};
 
-module.exports = {storageDirectory, storageFiles};
+module.exports = { storageDirectory, storageFiles };

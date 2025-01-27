@@ -1,1 +1,5 @@
-[{"id":"1","name":"phones"},{"id":"2","name":"monitors"},{"id":"1736873690036","name":"ecoflows"}]
+[
+    { "id": "1", "name": "phones" },
+    { "id": "2", "name": "monitors" },
+    { "id": "1736873690036", "name": "ecoflows" }
+]

@@ -3,24 +3,32 @@ const categoriesService = require('../services/categoriesService');
 const newValidationError = require('../utils/validationErrorUtil');
 const CustomError = require('../handlers/customError');
 
-const requiredProperties = ["categoryId", "name", "price", "photo", "description"];
+const requiredProperties = [
+    'categoryId',
+    'name',
+    'price',
+    'photo',
+    'description',
+];
 
-async function get(){
+async function getProducts() {
     return await productsAccessor.getProducts();
 }
 
-async function getById(productId){
+async function getProductById(productId) {
     let product = await productsAccessor.getProductById(productId);
-    if (!product) throw new CustomError(404, "No product with such id!")
+    if (!product) throw new CustomError(404, 'No product with such id!');
     return product;
 }
 
-async function getByCategory(categoryId){
-    let products = await productsAccessor.getProducts();
-    return products?.filter(product => product.categoryId === categoryId);
+async function getProductsByCategory(categoryId) {
+    if (!(await categoriesService.checkIfCategoryExists(categoryId))) {
+        throw new CustomError(400, 'Unknown product category!');
+    }
+    return productsAccessor.getByCategory(categoryId);
 }
 
-async function add(product){
+async function addProduct(product) {
     const validation = checkProduct(product, true);
     if (!validation.isValid) {
         throw new CustomError(validation.status, validation.message);
@@ -28,54 +36,66 @@ async function add(product){
     return await productsAccessor.addProduct(product);
 }
 
-async function edit(productId, productData){
-    if (!await checkIfProductExists(productId)){
-        throw new CustomError(404,"Product doesn't exists");
+async function editProduct(productId, productData) {
+    if (!(await checkIfProductExists(productId))) {
+        throw new CustomError(404, "Product doesn't exists");
     }
     const validation = checkProduct(productData, false);
     if (!validation.isValid) {
         throw new CustomError(validation.status, validation.message);
     }
-    return await productsAccessor.editProduct(productId, productData)
+    return await productsAccessor.editProduct(productId, productData);
 }
 
-async function del(productId){
-    if (!await checkIfProductExists(productId)){
-        throw new CustomError(404,"Product doesn't exists");
+async function deleteProduct(productId) {
+    if (!(await checkIfProductExists(productId))) {
+        throw new CustomError(404, "Product doesn't exists");
     }
     return await productsAccessor.deleteProduct(productId);
 }
 
-function checkProduct(product, isAllRequired){
-    let validation = {
-        status:200,
-        message: "",
-        isValid: true
+function checkProduct(product, isAllRequired) {
+    let isLengthCorrect = isAllRequired
+        ? Object.keys(product).length === requiredProperties.length
+        : Object.keys(product).length > 0;
+    let isPropertiesCorrect = Object.keys(product).every(key =>
+        requiredProperties.includes(key),
+    );
+    let isFormatCorrect = isLengthCorrect && isPropertiesCorrect;
+    if (!isFormatCorrect) {
+        return newValidationError(400, 'Product format is not correct!');
     }
 
-    let isFormatCorrect = (isAllRequired ? Object.keys(product).length === requiredProperties.length :
-        Object.keys(product).length > 0) && Object.keys(product).every((key) => requiredProperties.includes(key));
-    if (!isFormatCorrect){
-        return newValidationError(validation, 400, "Product format is not correct!");
+    if (
+        product.hasOwnProperty('categoryId') &&
+        !categoriesService.checkIfCategoryExists(product.categoryId)
+    ) {
+        return newValidationError(400, 'Unknown product category!');
     }
-
-    if (product.hasOwnProperty('categoryId') && !categoriesService.checkIfCategoryExists(product.categoryId)){
-        return newValidationError(validation, 400, "Unknown product category!");
+    if (product.hasOwnProperty('name') && !product.name) {
+        return newValidationError(400, 'Name is empty!');
     }
-    if (product.hasOwnProperty('name') && !product.name){
-        return newValidationError(validation, 400, "Name is empty!");
+    if (product.hasOwnProperty('price') && product.price <= 0) {
+        return newValidationError(400, 'Price must be more than 0!');
     }
-    if (product.hasOwnProperty('price') && product.price<=0){
-        return newValidationError(validation, 400, "Price must be more than 0!");
-    }
-
-    return validation;
+    return {
+        status: 200,
+        message: '',
+        isValid: true,
+    };
 }
 
 async function checkIfProductExists(productId) {
-    let products = await productsAccessor.getProducts();
-    return products.some(product=>product.id === productId);
+    let product = await productsAccessor.getProductById(productId);
+    return !!product;
 }
 
-
-module.exports = {get, getByCategory, add, edit, del, getById, checkIfProductExists};
+module.exports = {
+    getProducts,
+    getProductsByCategory,
+    addProduct,
+    editProduct,
+    deleteProduct,
+    getProductById,
+    checkIfProductExists,
+};

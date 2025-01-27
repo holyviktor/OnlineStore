@@ -1,9 +1,9 @@
-function newValidationError(validation, status, message){
-    validation.status = status;
-    validation.message = message;
-    validation.isValid = false;
-
-    return validation;
+function newValidationError(status, message) {
+    return {
+        status: status,
+        message: message,
+        isValid: false,
+    };
 }
 
 module.exports = newValidationError;

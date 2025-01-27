@@ -4,7 +4,7 @@ const ROUTES = {
     GET_BY_CATEGORY: '/category/:categoryId',
     ADD: '/add',
     DELETE: '/delete/:productId',
-    EDIT: '/edit/:productId'
-}
+    EDIT: '/edit/:productId',
+};
 
-module.exports = {ROUTES}
+module.exports = { ROUTES };

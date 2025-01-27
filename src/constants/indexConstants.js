@@ -3,7 +3,7 @@ const ROUTES = {
     USERS: '/users',
     CATEGORIES: '/categories',
     CART: '/cart',
-    ORDERS: '/orders'
+    ORDERS: '/orders',
 };
 
-module.exports = {ROUTES};
+module.exports = { ROUTES };
