@@ -1,21 +1,18 @@
-{
-  "products":
-    [
-      {
+[
+    {
         "id": "1",
         "categoryId": "1",
         "name": "iphone",
         "price": "1000",
         "photo": "",
         "description": "descr"
-      },
-      {
+    },
+    {
         "id": "2",
         "categoryId": "2",
         "name": "monitor",
         "price": "1000",
         "photo": "",
         "description": "descr"
-      }
-    ]
-}
+    }
+]
