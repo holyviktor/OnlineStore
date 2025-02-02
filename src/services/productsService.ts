@@ -3,6 +3,7 @@ import * as categoriesService from './categoriesService';
 import { newValidationError } from '../utils/validationErrorUtil';
 import { CustomError } from '../handlers/customError';
 import { IProduct } from '../models/productModel';
+import { IValidation } from '../models/validationModel';
 
 const requiredProperties = [
     'categoryId',
@@ -29,12 +30,7 @@ async function getProductsByCategory(categoryId: string): Promise<IProduct[]> {
     return productsAccessor.getByCategory(categoryId);
 }
 
-async function addProduct(
-    product: Pick<
-        IProduct,
-        'name' | 'categoryId' | 'price' | 'photo' | 'description'
-    >,
-) {
+async function addProduct(product: Omit<IProduct, 'id'>) {
     const validation = checkProduct(product, true);
     if (!validation.isValid) {
         throw new CustomError(validation.status, validation.message);
@@ -63,7 +59,10 @@ async function deleteProduct(productId: string): Promise<string> {
     return await productsAccessor.deleteProduct(productId);
 }
 
-function checkProduct(product: Partial<IProduct>, isAllRequired: boolean) {
+function checkProduct(
+    product: Partial<IProduct>,
+    isAllRequired: boolean,
+): IValidation {
     let isLengthCorrect = isAllRequired
         ? Object.keys(product).length === requiredProperties.length
         : Object.keys(product).length > 0;

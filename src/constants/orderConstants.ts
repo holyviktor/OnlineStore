@@ -1,4 +1,4 @@
-const ROUTES = {
+const ROUTES: Record<string, string> = {
     GET: '/',
     GET_USER_ORDERS: '/:userLogin',
     GET_BY_ID: '/:userLogin/:orderId',

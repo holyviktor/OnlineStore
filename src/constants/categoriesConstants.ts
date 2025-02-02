@@ -1,4 +1,4 @@
-const ROUTES = {
+const ROUTES: Record<string, string> = {
     GET: '/',
     GET_BY_ID: '/:categoryId',
     DELETE: '/delete/:categoryId',

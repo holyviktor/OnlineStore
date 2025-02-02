@@ -8,6 +8,7 @@ import { newValidationError } from '../utils/validationErrorUtil';
 import { CustomError } from '../handlers/customError';
 import bcrypt from 'bcrypt';
 import { IUser } from '../models/userModel';
+import { IValidation } from '../models/validationModel';
 
 async function getUsers(): Promise<IUser[]> {
     return usersAccessor.getUsers();
@@ -52,7 +53,7 @@ async function checkIfUserExists(userLogin: string): Promise<boolean> {
     return !!user;
 }
 
-function checkUser(user: Partial<IUser>, isAllRequired: boolean) {
+function checkUser(user: Partial<IUser>, isAllRequired: boolean): IValidation {
     let isLengthCorrect = isAllRequired
         ? Object.keys(user).length === requiredProperties.length
         : Object.keys(user).length > 0;

@@ -1,4 +1,4 @@
-const ROUTES = {
+const ROUTES: Record<string, string> = {
     PRODUCTS: '/products',
     USERS: '/users',
     CATEGORIES: '/categories',

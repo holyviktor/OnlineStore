@@ -49,15 +49,14 @@ async function subtractFromCart(
             const existingProduct = updatedCart.find(
                 obj => obj.productId === productId,
             );
-            if (existingProduct) {
-                if (existingProduct.count > 1) {
-                    existingProduct.count -= 1;
-                } else {
-                    updatedCart = updatedCart.filter(
-                        obj => obj.productId !== productId,
-                    );
-                }
+            if (existingProduct && existingProduct.count > 1) {
+                existingProduct.count -= 1;
+            } else if (existingProduct) {
+                updatedCart = updatedCart.filter(
+                    obj => obj.productId !== productId,
+                );
             }
+
             return { ...user, cart: updatedCart };
         }
         return user;
@@ -80,14 +79,12 @@ async function setToCart(
                 obj => obj.productId === productId,
             );
 
-            if (existingProduct) {
-                if (count === 0) {
-                    updatedCart = updatedCart.filter(
-                        obj => obj.productId !== productId,
-                    );
-                } else {
-                    existingProduct.count = count;
-                }
+            if (existingProduct && count === 0) {
+                updatedCart = updatedCart.filter(
+                    obj => obj.productId !== productId,
+                );
+            } else if (existingProduct) {
+                existingProduct.count = count;
             } else {
                 updatedCart.push({ productId: productId, count: count });
             }

@@ -10,12 +10,7 @@ async function getProducts(): Promise<IProduct[]> {
     return fileUtil.readFile(productStorage);
 }
 
-async function addProduct(
-    product: Pick<
-        IProduct,
-        'categoryId' | 'name' | 'description' | 'photo' | 'price'
-    >,
-): Promise<IProduct> {
+async function addProduct(product: Omit<IProduct, 'id'>): Promise<IProduct> {
     let products: IProduct[] = await getProducts();
     let createdProduct: IProduct = { id: uuidv4(), ...product };
     products.push(createdProduct);

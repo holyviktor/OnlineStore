@@ -14,7 +14,7 @@ async function getCategoryById(categoryId: string): Promise<ICategory | null> {
 }
 
 async function addCategory(
-    category: Pick<ICategory, 'name'>,
+    category: Omit<ICategory, 'id'>,
 ): Promise<ICategory> {
     let categories: ICategory[] = await getCategories();
     let createdCategory: ICategory = { id: uuidv4(), ...category };
@@ -25,10 +25,10 @@ async function addCategory(
 
 async function editCategory(
     categoryId: string,
-    categoryData: Pick<ICategory, 'name'>,
+    categoryData: Omit<ICategory, 'id'>,
 ): Promise<ICategory | undefined> {
     let categories: ICategory[] = await getCategories();
-    let changedCategory: ICategory | undefined = undefined;
+    let changedCategory: ICategory | undefined;
     categories = categories.map(category => {
         if (category.id === categoryId) {
             let newCategory: ICategory = {

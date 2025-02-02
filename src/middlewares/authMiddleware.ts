@@ -3,10 +3,11 @@ import { JwtPayload } from 'jsonwebtoken';
 import { NextFunction, Request, Response } from 'express';
 import { CustomError } from '../handlers/customError';
 import dotenv from 'dotenv';
+import { RequestHandler } from 'express-serve-static-core';
 
 dotenv.config();
 
-function authorize(roles: string[] = []) {
+function authorize(roles: string[] = []): RequestHandler {
     if (!Array.isArray(roles)) roles = [roles];
 
     return (req: Request, res: Response, next: NextFunction) => {

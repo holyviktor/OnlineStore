@@ -1,4 +1,4 @@
-const ROUTES = {
+const ROUTES: Record<string, string> = {
     GET: '/:userLogin',
     ADD: '/:userLogin/add',
     SET: '/:userLogin/set',

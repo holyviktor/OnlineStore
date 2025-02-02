@@ -22,12 +22,33 @@ async function addUser(
     return createdUser;
 }
 
-async function addOrderToUser(userLogin: string, orderId: string) {
+async function addOrderToUser(
+    userLogin: string,
+    orderId: string,
+): Promise<string> {
     let users: IUser[] = await getUsers();
     users = users.map(user => {
         if (user.login === userLogin) {
             const updatedOrders: string[] = [...user.orders];
             updatedOrders.push(orderId);
+            return { ...user, orders: updatedOrders };
+        }
+        return user;
+    });
+    await fileUtil.writeFile(usersStorage, users);
+    return orderId;
+}
+
+async function deleteOrderFromUser(
+    userLogin: string,
+    orderId: string,
+): Promise<string> {
+    let users: IUser[] = await getUsers();
+    users = users.map(user => {
+        if (user.login === userLogin) {
+            let updatedOrders: string[] = user.orders.filter(
+                userOrder => userOrder !== orderId,
+            );
             return { ...user, orders: updatedOrders };
         }
         return user;
@@ -71,4 +92,5 @@ export {
     editUser,
     deleteUser,
     addOrderToUser,
+    deleteOrderFromUser,
 };

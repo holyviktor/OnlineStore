@@ -1,30 +1,39 @@
 import { CustomError } from '../handlers/customError';
 import * as userService from '../services/usersService';
 import * as ordersAccessor from '../accessors/ordersAccessor';
-import { addOrderToUser } from '../accessors/usersAccessor';
+import {
+    addOrderToUser,
+    deleteOrderFromUser,
+} from '../accessors/usersAccessor';
 import { checkIfProductExists, getProductById } from './productsService';
 import { IOrder } from '../models/orderModel';
 
-async function getOrders() {
+async function getOrders(): Promise<IOrder[]> {
     return ordersAccessor.getOrders();
 }
 
-async function getOrderById(userLogin: string, orderId: string) {
-    let order = await ordersAccessor.getOrderById(orderId);
+async function getOrderById(
+    userLogin: string,
+    orderId: string,
+): Promise<IOrder> {
+    let order: IOrder | null = await ordersAccessor.getOrderById(orderId);
     if (!order) {
         throw new CustomError(404, "Order doesn't exists");
     }
     return order;
 }
 
-async function getOrdersByLogin(userLogin: string) {
+async function getOrdersByLogin(userLogin: string): Promise<IOrder[]> {
     if (!(await userService.checkIfUserExists(userLogin))) {
         throw new CustomError(404, "User doesn't exists");
     }
     return ordersAccessor.getUserOrders(userLogin);
 }
 
-async function createOrder(userLogin: string, order: Pick<IOrder, 'products'>) {
+async function createOrder(
+    userLogin: string,
+    order: Pick<IOrder, 'products'>,
+): Promise<string> {
     if (!(await userService.checkIfUserExists(userLogin))) {
         throw new CustomError(404, "User doesn't exists");
     }
@@ -40,7 +49,7 @@ async function createOrder(userLogin: string, order: Pick<IOrder, 'products'>) {
         cost += Number(currProduct.price) * product.count;
     }
 
-    let createdOrder = {
+    let createdOrder: Omit<IOrder, 'id'> = {
         ...order,
         cost: cost,
         date: new Date().toLocaleString(),
@@ -50,11 +59,15 @@ async function createOrder(userLogin: string, order: Pick<IOrder, 'products'>) {
     return addOrderToUser(userLogin, orderId);
 }
 
-async function deleteOrder(userLogin: string, orderId: string) {
+async function deleteOrder(
+    userLogin: string,
+    orderId: string,
+): Promise<string> {
     if (!(await hasUserOrderId(userLogin, orderId))) {
         throw new CustomError(404, "User don't have order with this id!");
     }
-    return ordersAccessor.deleteOrder(userLogin, orderId);
+    await ordersAccessor.deleteOrder(orderId);
+    return deleteOrderFromUser(userLogin, orderId);
 }
 
 async function hasUserOrderId(
