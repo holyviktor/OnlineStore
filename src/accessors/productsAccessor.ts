@@ -1,58 +1,38 @@
-import { v4 as uuidv4 } from 'uuid';
-
-import fileUtil = require('../utils/fileUtil');
-import storageConfig = require('../configs/storageConfig');
 import { IProduct } from '../models/productModel';
-
-const productStorage = `${storageConfig.storageDirectory}${storageConfig.storageFiles.PRODUCTS}`;
+import Product from '../schemas/productSchema';
+import mapProduct from '../mappers/productMapper';
 
 async function getProducts(): Promise<IProduct[]> {
-    return fileUtil.readFile(productStorage);
+    let products = await Product.find();
+    return products.map(product => mapProduct(product));
 }
 
 async function addProduct(product: Omit<IProduct, 'id'>): Promise<IProduct> {
-    let products: IProduct[] = await getProducts();
-    let createdProduct: IProduct = { id: uuidv4(), ...product };
-    products.push(createdProduct);
-    await fileUtil.writeFile(productStorage, products);
-    return createdProduct;
+    let createdProduct = new Product(product);
+    await createdProduct.save();
+    return mapProduct(createdProduct);
 }
 
 async function getProductById(productId: string): Promise<IProduct | null> {
-    let products: IProduct[] = await getProducts();
-    return products.find(product => product.id === productId) || null;
+    let product = await Product.findById(productId);
+    return product ? mapProduct(product) : null;
 }
 
 async function getByCategory(categoryId: string): Promise<IProduct[]> {
-    let products: IProduct[] = await getProducts();
-    return products?.filter(product => product.categoryId === categoryId);
+    let products = await Product.where('categoryId').equals(categoryId);
+    return products.map(product => mapProduct(product));
 }
 
 async function editProduct(
     productId: string,
     productData: Partial<IProduct>,
-): Promise<IProduct | undefined> {
-    let products: IProduct[] = await getProducts();
-    let changedProduct: IProduct | undefined;
-    products = products.map(product => {
-        if (product.id === productId) {
-            let newProduct = {
-                ...product,
-                ...productData,
-            };
-            changedProduct = newProduct;
-            return newProduct;
-        }
-        return product;
-    });
-    await fileUtil.writeFile(productStorage, products);
-    return changedProduct;
+): Promise<IProduct | null> {
+    await Product.updateOne({ _id: productId }, { $set: productData });
+    return getProductById(productId);
 }
 
 async function deleteProduct(productId: string): Promise<string> {
-    let products: IProduct[] = await getProducts();
-    products = products.filter(product => product.id !== productId);
-    await fileUtil.writeFile(productStorage, products);
+    await Product.deleteOne({ _id: productId });
     return productId;
 }
 
