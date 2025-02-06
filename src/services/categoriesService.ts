@@ -31,7 +31,7 @@ async function addCategory(
 async function editCategory(
     categoryId: string,
     categoryData: Omit<ICategory, 'id'>,
-): Promise<ICategory | undefined> {
+): Promise<ICategory | null> {
     if (!(await checkIfCategoryExists(categoryId))) {
         throw new CustomError(404, "Category doesn't exists");
     }

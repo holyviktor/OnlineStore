@@ -1,13 +1,16 @@
-import * as fileUtil from '../utils/fileUtil';
-import * as storageConfig from '../configs/storageConfig';
-import { getUserByLogin, getUsers } from './usersAccessor';
-import { IUser } from '../models/userModel';
 import { ICart } from '../models/cartModel';
-const usersStorage = `${storageConfig.storageDirectory}${storageConfig.storageFiles.USERS}`;
+import User from '../schemas/userSchema';
+import mongoose from 'mongoose';
+import { CustomError } from '../handlers/customError';
 
 async function getCartByUserLogin(userLogin: string): Promise<ICart[] | null> {
-    let user: IUser = await getUserByLogin(userLogin);
-    return user?.cart || null;
+    const user = await User.findOne({ login: userLogin });
+    return user
+        ? user.cart.map(({ productId, count }) => ({
+              productId: productId.toString(),
+              count,
+          }))
+        : null;
 }
 
 async function addToCart(
@@ -15,25 +18,23 @@ async function addToCart(
     productId: string,
     count: number,
 ): Promise<string> {
-    let users: IUser[] = await getUsers();
-    users = users.map(user => {
-        if (user.login === userLogin) {
-            const updatedCart = [...user.cart];
+    const user = await User.findOne({ login: userLogin });
+    if (!user) throw new CustomError(404, 'User not found');
 
-            const existingProduct = updatedCart.find(
-                obj => obj.productId === productId,
-            );
+    const cartItem = user.cart.find(item =>
+        item.productId.equals(new mongoose.Types.ObjectId(productId)),
+    );
 
-            if (existingProduct) {
-                existingProduct.count += count;
-            } else {
-                updatedCart.push({ productId: productId, count: count });
-            }
-            return { ...user, cart: updatedCart };
-        }
-        return user;
-    });
-    await fileUtil.writeFile(usersStorage, users);
+    if (cartItem) {
+        cartItem.count += count;
+    } else {
+        user.cart.push({
+            productId: new mongoose.Types.ObjectId(productId),
+            count: count,
+        });
+    }
+
+    await user.save();
     return productId;
 }
 
@@ -41,27 +42,21 @@ async function subtractFromCart(
     userLogin: string,
     productId: string,
 ): Promise<string> {
-    let users: IUser[] = await getUsers();
-    users = users.map(user => {
-        if (user.login === userLogin) {
-            let updatedCart = [...user.cart];
+    let user = await User.findOne({ login: userLogin });
+    if (!user) throw new CustomError(404, 'User not found');
+    const cartItem = user.cart.find(item =>
+        item.productId.equals(new mongoose.Types.ObjectId(productId)),
+    );
+    if (!cartItem) {
+        throw new CustomError(404, 'Product not in cart');
+    }
+    if (cartItem.count > 1) {
+        cartItem.count -= 1;
+    } else {
+        user.cart = user.cart.pull(cartItem._id);
+    }
 
-            const existingProduct = updatedCart.find(
-                obj => obj.productId === productId,
-            );
-            if (existingProduct && existingProduct.count > 1) {
-                existingProduct.count -= 1;
-            } else if (existingProduct) {
-                updatedCart = updatedCart.filter(
-                    obj => obj.productId !== productId,
-                );
-            }
-
-            return { ...user, cart: updatedCart };
-        }
-        return user;
-    });
-    await fileUtil.writeFile(usersStorage, users);
+    await user.save();
     return productId;
 }
 
@@ -70,29 +65,23 @@ async function setToCart(
     productId: string,
     count: number,
 ): Promise<string> {
-    let users: IUser[] = await getUsers();
-    users = users.map(user => {
-        if (user.login === userLogin) {
-            let updatedCart = [...user.cart];
+    let user = await User.findOne({ login: userLogin });
+    if (!user) throw new CustomError(404, 'User not found');
+    const cartItem = user.cart.find(item =>
+        item.productId.equals(new mongoose.Types.ObjectId(productId)),
+    );
+    if (!cartItem) {
+        user.cart.push({
+            productId: new mongoose.Types.ObjectId(productId),
+            count: count,
+        });
+    } else if (count === 0) {
+        user.cart = user.cart.pull(cartItem._id);
+    } else {
+        cartItem.count = count;
+    }
 
-            const existingProduct = updatedCart.find(
-                obj => obj.productId === productId,
-            );
-
-            if (existingProduct && count === 0) {
-                updatedCart = updatedCart.filter(
-                    obj => obj.productId !== productId,
-                );
-            } else if (existingProduct) {
-                existingProduct.count = count;
-            } else {
-                updatedCart.push({ productId: productId, count: count });
-            }
-            return { ...user, cart: updatedCart };
-        }
-        return user;
-    });
-    await fileUtil.writeFile(usersStorage, users);
+    await user.save();
     return productId;
 }
 
@@ -100,18 +89,18 @@ async function clearFromCart(
     userLogin: string,
     productId: string,
 ): Promise<string> {
-    let users: IUser[] = await getUsers();
-    users = users.map(user => {
-        if (user.login === userLogin) {
-            let updatedCart = [...user.cart];
-            updatedCart = updatedCart.filter(
-                obj => obj.productId !== productId,
-            );
-            return { ...user, cart: updatedCart };
-        }
-        return user;
-    });
-    await fileUtil.writeFile(usersStorage, users);
+    let user = await User.findOne({ login: userLogin });
+    if (!user) throw new CustomError(404, 'User not found');
+
+    const cartItem = user.cart.find(item =>
+        item.productId.equals(new mongoose.Types.ObjectId(productId)),
+    );
+    if (cartItem) {
+        user.cart = user.cart.pull(cartItem._id);
+        console.log(user.cart);
+    }
+
+    await user.save();
     return productId;
 }
 

@@ -74,7 +74,9 @@ async function hasUserOrderId(
     userLogin: string,
     orderId: string,
 ): Promise<boolean> {
-    return (await ordersAccessor.getUserOrdersIds(userLogin)).includes(orderId);
+    return ((await ordersAccessor.getUserOrdersIds(userLogin)) || []).includes(
+        orderId,
+    );
 }
 
 export { getOrders, getOrdersByLogin, createOrder, deleteOrder, getOrderById };

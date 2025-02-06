@@ -1,45 +1,37 @@
-import { v4 as uuidv4 } from 'uuid';
-import fileUtil = require('../utils/fileUtil');
-import storageConfig = require('../configs/storageConfig');
-import { getUserByLogin } from './usersAccessor';
 import { IOrder } from '../models/orderModel';
-import { IUser } from '../models/userModel';
-
-const ordersStorage = `${storageConfig.storageDirectory}${storageConfig.storageFiles.ORDERS}`;
+import Order from '../schemas/orderSchema';
+import User from '../schemas/userSchema';
+import mapOrder from '../mappers/orderMapper';
 
 async function getOrders(): Promise<IOrder[]> {
-    return fileUtil.readFile(ordersStorage);
+    let orders = await Order.find();
+    return orders.map(order => mapOrder(order));
 }
 
-async function getUserOrdersIds(userLogin: string): Promise<string[]> {
-    let user: IUser = await getUserByLogin(userLogin);
-    return user['orders'];
+async function getUserOrdersIds(userLogin: string): Promise<string[] | null> {
+    const data = await User.findOne({ login: userLogin }).select('orders');
+    return data?.orders.map(value => value._id.toString()) || null;
 }
 
 async function getUserOrders(userLogin: string): Promise<IOrder[]> {
-    let userOrdersIds: string[] = await getUserOrdersIds(userLogin);
-    let orders: IOrder[] = await getOrders();
-    orders = orders.filter(order => userOrdersIds.includes(order.id));
-    return orders;
+    let userOrdersIds = await getUserOrdersIds(userLogin);
+    let orders = await Order.find({ _id: { $in: userOrdersIds } });
+    return orders.map(order => mapOrder(order));
 }
 
 async function getOrderById(orderId: string): Promise<IOrder | null> {
-    let orders: IOrder[] = await getOrders();
-    return orders.find(order => order.id === orderId) || null;
+    let order = await Order.findById(orderId);
+    return order ? mapOrder(order) : null;
 }
 
 async function createOrder(order: Omit<IOrder, 'id'>): Promise<string> {
-    let orders = await getOrders();
-    let orderId: string = uuidv4();
-    orders.push({ ...order, id: orderId });
-    await fileUtil.writeFile(ordersStorage, orders);
-    return orderId;
+    let createdOrder = new Order(order);
+    await createdOrder.save();
+    return createdOrder.id;
 }
 
 async function deleteOrder(orderId: string): Promise<string> {
-    let orders = await getOrders();
-    orders = orders.filter(order => order.id !== orderId);
-    await fileUtil.writeFile(ordersStorage, orders);
+    await Order.deleteOne({ _id: orderId });
     return orderId;
 }
 

@@ -41,7 +41,7 @@ async function addProduct(product: Omit<IProduct, 'id'>) {
 async function editProduct(
     productId: string,
     productData: Partial<IProduct>,
-): Promise<IProduct | undefined> {
+): Promise<IProduct | null> {
     if (!(await checkIfProductExists(productId))) {
         throw new CustomError(404, "Product doesn't exists");
     }

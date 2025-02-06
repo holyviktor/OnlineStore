@@ -23,7 +23,7 @@ async function getUserByLogin(login: string): Promise<IUser> {
 async function editUser(
     userLogin: string,
     userData: Partial<IUser>,
-): Promise<IUser | undefined> {
+): Promise<IUser | null> {
     if (!(await checkIfUserExists(userLogin))) {
         throw new CustomError(404, "User doesn't exists");
     }
@@ -49,7 +49,7 @@ async function deleteUser(userLogin: string): Promise<string> {
 }
 
 async function checkIfUserExists(userLogin: string): Promise<boolean> {
-    let user: IUser = await usersAccessor.getUserByLogin(userLogin);
+    let user: IUser | null = await usersAccessor.getUserByLogin(userLogin);
     return !!user;
 }
 
