@@ -1,0 +1,17 @@
+services:
+  backend:
+    depends_on:
+      - database
+    build: .
+    ports:
+      - 3000:3000
+
+  database:
+    image: mongodb/mongodb-community-server:latest
+    ports:
+      - 27017:27017
+    volumes:
+      - store:/data/database
+
+volumes:
+  store:
