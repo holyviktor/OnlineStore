@@ -4,6 +4,9 @@ import { newValidationError } from '../utils/validationErrorUtil';
 import { CustomError } from '../handlers/customError';
 import { IProduct } from '../models/productModel';
 import { IValidation } from '../models/validationModel';
+import { ProductQuery } from '../models/productQueryModel';
+import { IProductFilter} from '../models/filterModel';
+import { ISortOption } from '../models/sortModel';
 
 const requiredProperties = [
     'categoryId',
@@ -13,8 +16,24 @@ const requiredProperties = [
     'description',
 ];
 
-async function getProducts(): Promise<IProduct[]> {
-    return await productsAccessor.getProducts();
+async function getProducts(productQuery: ProductQuery | undefined): Promise<IProduct[]> {
+    const filter: IProductFilter = {};
+    let sortOption: ISortOption = {};
+    if (productQuery){
+        if (productQuery.search) {
+            filter.name = { $regex: productQuery.search, $options: "i" };
+        }
+        if (productQuery.priceFrom !== undefined) {
+            filter.price = { ...filter.price, $gte: productQuery.priceFrom };
+        }
+        if (productQuery.priceTo !== undefined) {
+            filter.price = { ...filter.price, $lte: productQuery.priceTo };
+        }
+        if (productQuery.sort)
+            sortOption = { price: productQuery.sort === "asc" ? 1 : -1 };
+    }
+
+    return await productsAccessor.getProducts(filter, sortOption);
 }
 
 async function getProductById(productId: string): Promise<IProduct> {

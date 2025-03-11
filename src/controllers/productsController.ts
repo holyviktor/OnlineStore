@@ -1,5 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import * as productsService from '../services/productsService';
+import { querySchema } from '../models/productQueryValidationModel';
+import { CustomError } from '../handlers/customError';
 
 async function getProducts(
     req: Request,
@@ -7,7 +9,12 @@ async function getProducts(
     next: NextFunction,
 ): Promise<void> {
     try {
-        res.json(await productsService.getProducts());
+        const result = querySchema.safeParse(req.query);
+
+        if (!result.success) {
+            throw new CustomError(400, 'Wrong parameters format');
+        }
+        res.json(await productsService.getProducts(result.data));
     } catch (err) {
         next(err);
     }
