@@ -1,9 +1,11 @@
 import { IProduct } from '../models/productModel';
 import Product from '../schemas/productSchema';
 import mapProduct from '../mappers/productMapper';
+import { IProductFilter } from '../models/filterModel';
+import { ISortOption } from '../models/sortModel';
 
-async function getProducts(): Promise<IProduct[]> {
-    let products = await Product.find();
+async function getProducts(filter: IProductFilter, sortOption: ISortOption): Promise<IProduct[]> {
+    let products = await Product.find(filter).sort(sortOption);
     return products.map(product => mapProduct(product));
 }
 
