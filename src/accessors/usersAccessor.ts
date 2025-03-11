@@ -12,10 +12,16 @@ async function getUserByLogin(userLogin: string): Promise<IUser | null> {
     return user ? mapUser(user) : null;
 }
 
+async function isAdminExist(): Promise<boolean> {
+    const user = await User.findOne({ role: 'admin' });
+    return !!user;
+}
+
 async function addUser(
     user: Pick<IUser, 'login' | 'password' | 'email' | 'phoneNumber'>,
+    role: string = 'user'
 ): Promise<IUser> {
-    let createdUser = new User({ ...user, role: 'user', cart: [], orders: [] });
+    let createdUser = new User({ ...user, role, cart: [], orders: [] });
     await createdUser.save();
     return mapUser(createdUser);
 }
@@ -57,4 +63,5 @@ export {
     deleteUser,
     addOrderToUser,
     deleteOrderFromUser,
+    isAdminExist
 };

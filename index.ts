@@ -12,13 +12,15 @@ import { router as usersRouter } from './src/routes/usersRoute';
 import { router as cartRouter } from './src/routes/cartRoute';
 import { router as ordersRouter } from './src/routes/ordersRoute';
 import { CustomError } from './src/handlers/customError';
+import { createAdminIfNotExists } from './src/seeders/seedAdmin';
 
 if (!process.env.DB_CONNECTION_STRING) {
     throw new CustomError(500, 'No connection string!');
 }
 mongoose
     .connect(process.env.DB_CONNECTION_STRING)
-    .then(() => console.log('Connected to database.'));
+    .then(() => console.log('Connected to database.'))
+    .then(()=> createAdminIfNotExists());
 
 const app = express();
 const port = process.env.SERVER_PORT || 3000;
